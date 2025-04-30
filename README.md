@@ -1,52 +1,37 @@
-# SafeClean
+# 🧹 SafeClean [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Shell](https://img.shields.io/badge/Script-Bash-green.svg)](https://www.gnu.org/software/bash/) [![Status](https://img.shields.io/badge/status-stable-brightgreen.svg)](#)
 
-A robust, secure, and configurable system cleanup script for Linux servers.
+A reliable and customizable cleanup script for Linux systems.
 
-[Русская версия (Russian version)](README_RU.md)
+---
 
-## Overview
+## ⚙️ Features
 
-SafeClean is a comprehensive system cleanup tool designed specifically for Linux servers. It safely removes unnecessary files, cleans up system logs, and frees disk space while maintaining system stability and security.
+- 🧼 **Comprehensive cleanup**: Docker resources, systemd journals, APT cache, Snap revisions, and `/tmp`
+- 🔒 **Safe execution**: Avoids deleting critical files and checks for necessary permissions
+- 📊 **Pre-cleanup analysis**: Estimates disk space to be freed before executing
+- 🕒 **Flexible scheduling**: Supports both `systemd` timers and traditional `cron` jobs
+- 🧩 **Highly configurable**: Customize behavior via CLI flags, config files, or interactive menu
+- 📝 **Logging support**: Optional `syslog` logging with JSON format
+- 🧪 **Dry-run mode**: Simulates cleanup actions without making any changes
+- 🔍 **Self-test**: Built-in integrity and functionality test
 
-## Features
+---
 
-- **Comprehensive Cleanup**: Cleans Docker resources, systemd journals, APT cache, Snap revisions, and temporary files
-- **Safe Operation**: Performs thorough checks before deletion and avoids removing critical files
-- **Detailed Analysis**: Provides estimates of reclaimable space before performing any actions
-- **Flexible Scheduling**: Supports both systemd timers and traditional cron jobs
-- **Configurable**: Customizable thresholds and behavior through command-line options or interactive menu
-- **Logging**: Optional syslog integration with JSON format support
-- **Test Mode**: Simulates cleanup operations without making actual changes
-- **Self-Testing**: Built-in self-test functionality to verify script integrity
+## 🚀 Quick Installation
 
-## Installation
-
-### Quick Installation (One-liner)
+Using `wget`:
 
 ```bash
 bash <(wget -qO- https://raw.githubusercontent.com/DigneZzZ/safe-clean-up/main/safeclean.sh) --install
 ```
 
-Or with curl:
+Using `curl`:
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/DigneZzZ/safe-clean-up/main/safeclean.sh) --install
 ```
 
-### Manual Installation
-
-```bash
-# Download the script
-wget https://raw.githubusercontent.com/DigneZzZ/safe-clean-up/main/safeclean.sh
-
-# Make it executable
-chmod +x safeclean.sh
-
-# Install it system-wide
-sudo ./safeclean.sh --install
-```
-
-### From Repository
+From repository:
 
 ```bash
 git clone https://github.com/DigneZzZ/safe-clean-up.git
@@ -55,107 +40,112 @@ chmod +x safeclean.sh
 sudo ./safeclean.sh --install
 ```
 
-## Usage
+---
 
-### Basic Usage
+## 📌 Basic Usage
 
 ```bash
-# Show help
-safeclean --help
-
-# Analyze system without cleaning (dry run)
-safeclean --dry-run
-
-# Clean with confirmation prompts
-safeclean
-
-# Clean without confirmation (requires root)
-sudo safeclean --force
+safeclean --help           # Show help message
+safeclean --dry-run        # Analyze without making changes
+sudo safeclean             # Run cleanup with confirmation
+sudo safeclean --force     # Run cleanup without prompts
 ```
 
-### Advanced Options
+---
+
+## 🛠️ Advanced Options
 
 ```bash
-# Configure settings through interactive menu
-safeclean --config
-
-# Use custom configuration file
-safeclean --config-path /path/to/config
-
-# Set specific journal retention
-safeclean --journal-days 7 --journal-size 300
-
-# Keep Docker images during cleanup
-safeclean --keep-docker-images
-
-# Enable syslog with JSON format
-safeclean --syslog --json-log
-
-# Test mode (shows commands without executing them)
-safeclean --test-mode
+safeclean --config                   # Launch interactive config menu
+safeclean --journal-days 7          # Retain logs for N days
+safeclean --journal-size 300        # Limit journal size to N MB
+safeclean --keep-docker-images      # Preserve Docker images
+safeclean --syslog --json-log       # Enable syslog with JSON format
+safeclean --test-mode               # Simulate cleanup actions
 ```
 
-### Scheduling
+---
+
+## ⏱️ Scheduling
 
 ```bash
-# Schedule with systemd timer (recommended for modern systems)
+# Using systemd (recommended)
 sudo safeclean --schedule-systemd daily
 
-# Schedule with traditional cron
+# Using cron
 sudo safeclean --schedule weekly
 
-# Remove all scheduled tasks
+# Remove all scheduled jobs
 sudo safeclean --unschedule
 ```
 
-## Configuration
+---
 
-SafeClean can be configured through command-line options, an interactive menu, or configuration files.
+## ⚙️ Configuration
 
-### Default Configuration Locations
+The script can be configured via CLI, an interactive menu, or config files.
 
-- System-wide: `/etc/safeclean/config`
-- User-specific: `~/.config/safeclean/config`
+### Default config file paths:
 
-### Configuration Parameters
+- **System-wide**: `/etc/safeclean/config`
+- **User-specific**: `~/.config/safeclean/config`
 
-- `JOURNAL_DAYS`: Number of days to keep systemd journal logs (default: 10)
-- `JOURNAL_SIZE`: Maximum size of systemd journal in MB (default: 500)
-- `DOCKER_KEEP_IMAGES`: Whether to preserve Docker images during cleanup (default: false)
-- `TEMP_FILES_AGE`: Age in days of temporary files to delete (default: 1)
-- `USE_SYSLOG`: Enable logging to syslog (default: false)
-- `USE_JSON_LOG`: Use JSON format for syslog entries (default: false)
-- `CONFIRM_APT_AUTOREMOVE`: Prompt for confirmation before apt autoremove (default: true)
+### Example config parameters:
 
-## Security Features
+```ini
+JOURNAL_DAYS=10
+JOURNAL_SIZE=500
+DOCKER_KEEP_IMAGES=false
+TEMP_FILES_AGE=1
+USE_SYSLOG=true
+USE_JSON_LOG=true
+CONFIRM_APT_AUTOREMOVE=true
+```
 
-- Root permission checks for sensitive operations
-- Safe handling of temporary files
-- Verification of open files before deletion
-- Dependency checking before execution
-- Comprehensive error handling and logging
+---
 
-## Requirements
+## 🔐 Safety
 
-- Bash 4.0 or higher
-- Core utilities: find, du, df, lsof, bc
-- Optional: systemd (for timer functionality)
-- Optional: logger (for syslog integration)
+- Verifies root access when required
+- Avoids deleting critical or open files
+- Checks dependencies before running
+- Logs all errors and actions
+- Integrated self-test functionality
 
-## Compatibility
+---
 
-SafeClean is designed to work on most Linux distributions, with specific support for:
+## ✅ Compatibility
 
-- Ubuntu/Debian
-- CentOS/RHEL
+Designed for most Linux distributions, with tested support for:
+
+- Ubuntu / Debian
+- CentOS / RHEL
 - Fedora
 - Arch Linux
 - openSUSE
 
-## License
+**Requires:** `bash >= 4.0`, `find`, `du`, `df`, `lsof`, `bc`  
+**Optional:** `systemd`, `logger`
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-## Contributing
+## 🧪 Self-Test
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Run internal diagnostics and validation checks:
+
+```bash
+safeclean --self-test
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open pull requests or issues. Please ensure your code is tested and matches the project’s style.
+```

@@ -1,37 +1,67 @@
-# 🧹 SafeClean [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Shell](https://img.shields.io/badge/Script-Bash-green.svg)](https://www.gnu.org/software/bash/) [![Status](https://img.shields.io/badge/status-stable-brightgreen.svg)](#)
+# SafeClean
 
-A reliable and customizable cleanup script for Linux systems.
+![Shell Script](https://img.shields.io/badge/bash-4.0%2B-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Status](https://img.shields.io/badge/status-stable-brightgreen.svg)
 
----
-
-## ⚙️ Features
-
-- 🧼 **Comprehensive cleanup**: Docker resources, systemd journals, APT cache, Snap revisions, and `/tmp`
-- 🔒 **Safe execution**: Avoids deleting critical files and checks for necessary permissions
-- 📊 **Pre-cleanup analysis**: Estimates disk space to be freed before executing
-- 🕒 **Flexible scheduling**: Supports both `systemd` timers and traditional `cron` jobs
-- 🧩 **Highly configurable**: Customize behavior via CLI flags, config files, or interactive menu
-- 📝 **Logging support**: Optional `syslog` logging with JSON format
-- 🧪 **Dry-run mode**: Simulates cleanup actions without making any changes
-- 🔍 **Self-test**: Built-in integrity and functionality test
+A reliable, secure, and customizable system cleanup script for Linux servers.
 
 ---
 
-## 🚀 Quick Installation
+## 📦 Overview
 
-Using `wget`:
+**SafeClean** is a universal tool for **safe cleanup of Linux servers**. It removes unnecessary files, clears system logs, cache, temporary files, and old packages — **without risking system stability**.
+
+The script performs analysis, warns about estimated cleanup volume, and gives you full control — simple, flexible, and safe.
+
+---
+
+## 🚀 Features
+
+- 🧹 **Comprehensive cleanup**: Docker, systemd logs, APT, Snap, temp files
+- 🔐 **Safe operation**: thorough checks and minimized risks
+- 📊 **Detailed analysis** before execution
+- 🛠️ **Flexible configuration**: config files, CLI flags, and interactive menu
+- 🧪 **Test mode**: simulate cleanup without deleting anything
+- 🔄 **Scheduler**: supports systemd timers and cron jobs
+- 📝 **Syslog logging**, including JSON format
+- ✅ **Built-in self-testing**
+
+---
+
+## 📚 How It Works
+
+1. **Analyzes the system**: assesses logs, cache, Snap, Docker, and temp files.
+2. **Displays a report** and estimated free space.
+3. **Performs cleanup** — only after your confirmation or in `--force` mode.
+4. Supports **simulation** via `--dry-run` or `--test-mode`.
+
+---
+
+## 🧠 When to Use It?
+
+- When you're running out of disk space
+- For regular server maintenance
+- Before creating a backup
+- Automatically on schedule (weekly/monthly)
+
+---
+
+## ⚙️ Installation
+
+### 📥 Quick Install
 
 ```bash
 bash <(wget -qO- https://raw.githubusercontent.com/DigneZzZ/safe-clean-up/main/safeclean.sh) --install
 ```
 
-Using `curl`:
+or
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/DigneZzZ/safe-clean-up/main/safeclean.sh) --install
 ```
 
-From repository:
+### 🧰 Via Git
 
 ```bash
 git clone https://github.com/DigneZzZ/safe-clean-up.git
@@ -42,96 +72,54 @@ sudo ./safeclean.sh --install
 
 ---
 
-## 📌 Basic Usage
+## 🖥️ Usage Examples
 
 ```bash
-safeclean --help           # Show help message
-safeclean --dry-run        # Analyze without making changes
-sudo safeclean             # Run cleanup with confirmation
-sudo safeclean --force     # Run cleanup without prompts
+safeclean --dry-run                 # Analyze without deleting
+sudo safeclean --force             # Cleanup without confirmation
+safeclean --config                 # Configure parameters manually
+safeclean --schedule-systemd weekly  # Schedule weekly run
 ```
 
 ---
 
-## 🛠️ Advanced Options
+## 🔧 Configuration
 
-```bash
-safeclean --config                   # Launch interactive config menu
-safeclean --journal-days 7          # Retain logs for N days
-safeclean --journal-size 300        # Limit journal size to N MB
-safeclean --keep-docker-images      # Preserve Docker images
-safeclean --syslog --json-log       # Enable syslog with JSON format
-safeclean --test-mode               # Simulate cleanup actions
-```
+Configuration can be defined via:
+- CLI: `--journal-days 7`
+- Interactive menu: `safeclean --config`
+- Config file:
+  - system-wide: `/etc/safeclean/config`
+  - user-specific: `~/.config/safeclean/config`
+  - custom: `--config-path /path/to/file`
+
+### Example parameters:
+
+| Parameter                 | Description                                       | Default     |
+|--------------------------|---------------------------------------------------|-------------|
+| `JOURNAL_DAYS`           | Retain systemd logs for N days                    | `10`        |
+| `JOURNAL_SIZE`           | Max journal size in MB                            | `500`       |
+| `DOCKER_KEEP_IMAGES`     | Preserve Docker images                            | `false`     |
+| `TEMP_FILES_AGE`         | Delete temp files older than N days               | `1`         |
+| `USE_SYSLOG`             | Log to syslog                                     | `false`     |
+| `USE_JSON_LOG`           | Use JSON format for logs                          | `false`     |
+| `CONFIRM_APT_AUTOREMOVE` | Ask for confirmation before apt autoremove        | `true`      |
 
 ---
 
 ## ⏱️ Scheduling
 
+Supports both `systemd` and `cron`:
+
 ```bash
-# Using systemd (recommended)
-sudo safeclean --schedule-systemd daily
-
-# Using cron
-sudo safeclean --schedule weekly
-
-# Remove all scheduled jobs
-sudo safeclean --unschedule
+sudo safeclean --schedule-systemd daily   # With systemd timer
+sudo safeclean --schedule weekly          # With cron
+sudo safeclean --unschedule               # Remove scheduled jobs
 ```
 
 ---
 
-## ⚙️ Configuration
-
-The script can be configured via CLI, an interactive menu, or config files.
-
-### Default config file paths:
-
-- **System-wide**: `/etc/safeclean/config`
-- **User-specific**: `~/.config/safeclean/config`
-
-### Example config parameters:
-
-```ini
-JOURNAL_DAYS=10
-JOURNAL_SIZE=500
-DOCKER_KEEP_IMAGES=false
-TEMP_FILES_AGE=1
-USE_SYSLOG=true
-USE_JSON_LOG=true
-CONFIRM_APT_AUTOREMOVE=true
-```
-
----
-
-## 🔐 Safety
-
-- Verifies root access when required
-- Avoids deleting critical or open files
-- Checks dependencies before running
-- Logs all errors and actions
-- Integrated self-test functionality
-
----
-
-## ✅ Compatibility
-
-Designed for most Linux distributions, with tested support for:
-
-- Ubuntu / Debian
-- CentOS / RHEL
-- Fedora
-- Arch Linux
-- openSUSE
-
-**Requires:** `bash >= 4.0`, `find`, `du`, `df`, `lsof`, `bc`  
-**Optional:** `systemd`, `logger`
-
----
-
-## 🧪 Self-Test
-
-Run internal diagnostics and validation checks:
+## 🧪 Self-Testing
 
 ```bash
 safeclean --self-test
@@ -139,13 +127,60 @@ safeclean --self-test
 
 ---
 
+## 🛡️ Security
+
+- Root access check
+- Safe handling of `/tmp`
+- Accounts for open files
+- All actions are logged
+- Supports dry-run and test-mode
+- Strict dependency validation
+
+---
+
+## ✅ Requirements
+
+- Bash 4.0+
+- Utilities: `find`, `du`, `df`, `lsof`, `bc`
+- Optional: `systemd`, `logger`
+
+---
+
+## 🐧 Compatibility
+
+- Ubuntu / Debian
+- CentOS / RHEL
+- Fedora
+- Arch Linux
+- openSUSE
+
+---
+
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+[MIT License](LICENSE)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open pull requests or issues. Please ensure your code is tested and matches the project’s style.
-```
+Pull requests are welcome!  
+Report bugs, suggest improvements, and share your experience.
+
+---
+
+## 📚 Additional Resources
+
+- 🌐 **Community Forum**: [openode.xyz](https://openode.xyz) — discussions on panels, scripts, and VPN setups.
+- 📖 **Personal Blog**: [neonode.cc](https://neonode.cc) — technical notes, guides, and practical solutions.
+
+### 💎 Premium Content
+
+The forum [openode.xyz](https://openode.xyz) offers a **paid section** with access to:
+
+- Detailed installation guides for **Remnawave**, **Marzban**, **3x-ui**, **X-UI**, and more.
+- **Private SHM Club** — guides, configurations, and real-life use cases.
+- Up-to-date scripts, automation tools, personal deployment and monetization experience.
+
+👉 **Supporting the project via subscription** helps maintain high-quality and up-to-date content.
+
